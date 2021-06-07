@@ -1,13 +1,15 @@
 const db = require("../database/db")
 
 class Model{
-    static table = ""
-    static fillable = []
+    table = ""
+    fillable = []
 
-    //Static methods
+    //Model constructor 
     constructor(cols){
         this.cols = cols
     }
+
+    //Static methods
 
     //Find All -- Find by all table members
     static findAll(){
@@ -23,8 +25,8 @@ class Model{
     //Find -- Find by column id
     static find(id){
         try{
-            const rows = db.query(`SELECT * FROM ${this.table} WHERE id = ${id}`)
-            return rows.map(row => this.prototype.constructor(row))[0]
+            const row = db.query(`SELECT * FROM ${this.table} WHERE id = ${id}`)[0]
+            return this.prototype.constructor(row)
         } catch(err){
             console.log(err)
         }
@@ -56,13 +58,20 @@ class Model{
     //Save -- Saving new column  to table or updating existing one
     save(){
         try{
-            const values = this.fillable.map(field => `${this[field]}`).join() + `,${this.cols.id}`
-            db.query(`INSERT INTO ${this.table} (${this.fillable.join()}) VALUES (${values})
-            ON DUPLICATE KEY UPDATE `)
+            const values = this.fillable.map(field => this.cols[field])
+            if(this.cols.id) {values.push(this.cols.id)}
+
+            const query = `INSERT INTO ${this.table} (${this.fillable.join()}) VALUES (?)
+            ON DUPLICATE KEY UPDATE ${this.fillable.map(field => `${field}=VALUES(${field})`).join()}`
+
+            db.query(query, [values], (err, result, fields) => {
+                if(err) console.log(err);
+                if(result.insertId) this.cols.id = result.insertId;
+            })
         } catch(err){
             console.log(err)
         }
     }
 }
 
-module.exports = {Model}
+module.exports = Model
