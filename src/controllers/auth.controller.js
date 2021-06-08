@@ -1,6 +1,7 @@
 const User = require('../models/User')
 const bcrypt = require('bcrypt')
-class UserController{
+
+class AuthController{
 
     static register = async (req, res) => {
         //Create new user in database
@@ -67,4 +68,4 @@ class UserController{
 
 }
 
-module.exports = UserController
+module.exports = AuthController
