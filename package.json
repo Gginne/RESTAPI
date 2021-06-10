@@ -1,7 +1,7 @@
 {
-  "name": "quizapp",
+  "name": "restapi",
   "version": "1.0.0",
-  "description": "quiz and survey application",
+  "description": "Basic Rest API for web applications",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Gginne/QuizApp.git"
+    "url": "git+https://github.com/Gginne/RESTAPI.git"
   },
   "keywords": [
     "quiz",
@@ -20,9 +20,9 @@
   "author": "Gianncarlo Carrasco",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Gginne/QuizApp/issues"
+    "url": "https://github.com/Gginne/RESTAPI/issues"
   },
-  "homepage": "https://github.com/Gginne/QuizApp#readme",
+  "homepage": "https://github.com/Gginne/RESTAPI#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
