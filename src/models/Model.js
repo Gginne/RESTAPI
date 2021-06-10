@@ -1,8 +1,8 @@
 const db = require("../database/db")
 
 class Model{
-    table = ""
-    fillable = []
+    static table = ""
+    static fillable = []
 
     //Model constructor 
     constructor(cols){
@@ -12,10 +12,12 @@ class Model{
     //Static methods
 
     //Find All -- Find by all table members
-    static findAll(){
+    static async findAll(){
         try{
-            const rows = db.query(`SELECT * FROM ${this.table}`)
-            return rows.map(row => this.prototype.constructor(row))
+            let rows = await db.query(`SELECT * FROM ${this.table}`)
+            rows = rows.map(row => new this.prototype.constructor(row))
+            if(rows.length == 1) return rows[0];
+            return rows
         } catch(err){
             console.log(err)
         }
@@ -23,10 +25,10 @@ class Model{
     }
 
     //Find -- Find by column id
-    static find(id){
+    static async find(id){
         try{
-            const row = db.query(`SELECT * FROM ${this.table} WHERE id = ${id}`)[0]
-            return this.prototype.constructor(row)
+            const row = await db.query(`SELECT * FROM ${this.table} WHERE id = ${id}`)
+            return new this.prototype.constructor(row[0])
         } catch(err){
             console.log(err)
         }
@@ -34,10 +36,12 @@ class Model{
     }
 
     //Where -- Find column by other parameters
-    static where(params){
+    static async where(params){
         try{
-            const rows = db.query(`SELECT * FROM ${this.table} WHERE ${params}`)
-            return rows.map(row => this.prototype.constructor(row))
+            let rows = await db.query(`SELECT * FROM ${this.table} WHERE ${params}`)
+            rows = rows.map(row => new this.prototype.constructor(row))
+            if(rows.length == 1) return rows[0];
+            return rows
         } catch(err){
             console.log(err)
         }
@@ -47,27 +51,28 @@ class Model{
     //Instance methods
 
     //Delete -- Deleting column
-    delete(){
+   async delete(){
         try{
-            db.query(`DELETE FROM ${this.table} WHERE id = ${this.cols.id}`)
+            await db.query(`DELETE FROM ${this.table} WHERE id = ${this.cols.id}`)
         } catch(err){
             console.log(err)
         }
     }
 
     //Save -- Saving new column  to table or updating existing one
-    save(){
+    async save(){
         try{
             const values = this.fillable.map(field => this.cols[field])
             if(this.cols.id) {values.push(this.cols.id)}
 
             const query = `INSERT INTO ${this.table} (${this.fillable.join()}) VALUES (?)
             ON DUPLICATE KEY UPDATE ${this.fillable.map(field => `${field}=VALUES(${field})`).join()}`
-
-            db.query(query, [values], (err, result, fields) => {
-                if(err) console.log(err);
+            try{
+                const result = await db.query(query, [values])
                 if(result.insertId) this.cols.id = result.insertId;
-            })
+            } catch(err){
+                console.log(err);
+            }
         } catch(err){
             console.log(err)
         }

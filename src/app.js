@@ -16,7 +16,7 @@ app.set('port', process.env.PORT || 5000)
 app.use(bodyParser.urlencoded({extended: true}))
 
 //Routes
-app.use('users', authRoutes)
+app.use('/users', authRoutes)
 app.get("/", (req, res) => {
   res.write("<h1>Hello World</h1>")
   res.send()

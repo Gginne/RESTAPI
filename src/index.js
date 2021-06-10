@@ -8,7 +8,7 @@ async function main(){
     const port = app.get('port')
     await app.listen(port)
     //await migrate()
-    await seeder()
+    //await seeder()
     console.log("listening at port: "+port) 
     console.log
 }
