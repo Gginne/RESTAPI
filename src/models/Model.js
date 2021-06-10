@@ -64,9 +64,9 @@ class Model{
         try{
             const values = this.fillable.map(field => this.cols[field])
             if(this.cols.id) {values.push(this.cols.id)}
-
             const query = `INSERT INTO ${this.table} (${this.fillable.join()}) VALUES (?)
             ON DUPLICATE KEY UPDATE ${this.fillable.map(field => `${field}=VALUES(${field})`).join()}`
+            
             try{
                 const result = await db.query(query, [values])
                 if(result.insertId) this.cols.id = result.insertId;

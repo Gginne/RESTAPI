@@ -7,6 +7,7 @@ class AuthController{
     static async register(req, res){
         //Create new user in database
         const {email, username, password, password2} = req.body
+        console.log(req.body)
         let errors = []
         if(!email || !username || !password || !password2){
             res.send({message:'Please fill in all the fields'});
@@ -18,28 +19,26 @@ class AuthController{
         }
 
         if(!errors){
-            if(email && username){
-                const foundEmail = await User.where(`email='${email}'`)
-                const foundUsername = await User.where(`username='${username}'`)
-                if(foundEmail.length > 0 || foundUsername > 0){
-                    if(foundEmail.length > 0) res.send({message: "Email already exists"});
-                    if(foundUsername.length > 0) res.send({message: "Username already exists"})
-                } else {
-                    try{
-                        const salt = await bcrypt.genSaltSync(10)
-                        password = await bcrypt.hash(password, salt);
-                        const newUser = new User({email, username, password})
-                        newUser.save()
-                        res.send({message: "Successfully registered"})
-                    } catch(err){
-                        throw err
-                    }
+            const foundEmail = await User.where(`email='${email}'`)
+            const foundUsername = await User.where(`username='${username}'`)
+            if(foundEmail.length > 0 || foundUsername > 0){
+                if(foundEmail.length > 0) res.send({message: "Email already exists"});
+                if(foundUsername.length > 0) res.send({message: "Username already exists"});
+            } else {
+                try{
+                    const salt = await bcrypt.genSaltSync(10)
+                    password = await bcrypt.hash(password, salt);
+                    const newUser = new User({email, username, password})
+                    newUser.save()
+                    res.send({message: "Successfully registered"})
+                } catch(err){
+                    res.send({message: "Unsuccessfully registered"})
+                    throw err
                 }
-            } 
+            }
         }
 
         res.end()
-       
     }
 
     static async login(req, res){
