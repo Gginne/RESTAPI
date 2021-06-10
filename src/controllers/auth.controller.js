@@ -29,6 +29,7 @@ class AuthController{
                     password = await bcrypt.hash(password, salt);
                     const newUser = new User({email, username, password})
                     await newUser.save()
+                    //Send message and authentication key
                     res.send({message: "Successfully registered"})
                 } catch(err){
                     res.send({message: "Unsuccessfully registered"})
@@ -42,16 +43,14 @@ class AuthController{
 
     static async login(req, res){
         const {name, password} = req.body
-        
+        //console.log(req.body)
         if (name && password) {
             //Get user from model
            
             const user = await User.where(`email='${name}' OR username='${name}'`)
-            const bcryptPassword = await bcrypt.compareSync(password, user.length ? user.cols.password : '');
-
-            //console.log(bcryptPassword)
+            const bcryptPassword = bcrypt.compareSync(password, user ? user.cols.password : '');
             if(user && bcryptPassword){
-                //Login stuff create and return hash
+                //Send message and authentication key
                 res.send({message: 'Successfully Logged In'})
             } else {
                 res.send({message: 'Invalid Username/email or password'})

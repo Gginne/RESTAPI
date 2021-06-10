@@ -1,9 +1,7 @@
 //Imports
 require("dotenv").config()
 const express = require("express")
-const bodyParser = require("body-parser")
-const router = express.Router()
-const db = require("./database/db")
+const cors = require("cors")
 
 //Routes
 const authRoutes = require('./routes/auth.routes')
@@ -13,7 +11,8 @@ const app = express()
 app.set('port', process.env.PORT || 5000)
 
 //Middleware
-app.use(bodyParser.urlencoded({extended: true}))
+app.use(express.urlencoded({extended: true}))
+app.use(cors())
 
 //Routes
 app.use('/users', authRoutes)
