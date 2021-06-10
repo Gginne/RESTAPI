@@ -17,6 +17,7 @@ class Model{
             let rows = await db.query(`SELECT * FROM ${this.table}`)
             rows = rows.map(row => new this.prototype.constructor(row))
             if(rows.length == 1) return rows[0];
+            else if(rows.length == 0) return null;
             return rows
         } catch(err){
             console.log(err)
@@ -41,9 +42,10 @@ class Model{
             let rows = await db.query(`SELECT * FROM ${this.table} WHERE ${params}`)
             rows = rows.map(row => new this.prototype.constructor(row))
             if(rows.length == 1) return rows[0];
+            else if(rows.length == 0) return null;
             return rows
         } catch(err){
-            console.log(err)
+            throw err
         }
         
     }

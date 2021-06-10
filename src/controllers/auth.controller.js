@@ -6,9 +6,8 @@ class AuthController{
 
     static async register(req, res){
         //Create new user in database
-        const {email, username, password, password2} = req.body
-        console.log(req.body)
-        let errors = []
+        let {email, username, password, password2} = req.body
+        let errors = 0
         if(!email || !username || !password || !password2){
             res.send({message:'Please fill in all the fields'});
             errors++
@@ -21,15 +20,15 @@ class AuthController{
         if(!errors){
             const foundEmail = await User.where(`email='${email}'`)
             const foundUsername = await User.where(`username='${username}'`)
-            if(foundEmail.length > 0 || foundUsername > 0){
-                if(foundEmail.length > 0) res.send({message: "Email already exists"});
-                if(foundUsername.length > 0) res.send({message: "Username already exists"});
+            if(foundEmail || foundUsername){
+                if(foundEmail) res.send({message: "Email already exists"});
+                else if(foundUsername) res.send({message: "Username already exists"});
             } else {
                 try{
                     const salt = await bcrypt.genSaltSync(10)
                     password = await bcrypt.hash(password, salt);
                     const newUser = new User({email, username, password})
-                    newUser.save()
+                    await newUser.save()
                     res.send({message: "Successfully registered"})
                 } catch(err){
                     res.send({message: "Unsuccessfully registered"})
@@ -46,10 +45,10 @@ class AuthController{
         
         if (name && password) {
             //Get user from model
-            const passQuery = await db.query(`SELECT password FROM Users WHERE email='${name}' OR username='${name}'`)
-        
-            const bcryptPassword = await bcrypt.compareSync(password, passQuery[0].password);
+           
             const user = await User.where(`email='${name}' OR username='${name}'`)
+            const bcryptPassword = await bcrypt.compareSync(password, user.length ? user.cols.password : '');
+
             //console.log(bcryptPassword)
             if(user && bcryptPassword){
                 //Login stuff create and return hash
