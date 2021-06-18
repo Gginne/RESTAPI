@@ -29,7 +29,7 @@ class AuthController{
                 await newUser.save()
                 //Send message and authentication key
                 const {id} = newUser.cols
-                const token = jwt.sign({id}, process.env.TOKEN_SECRET, { expiresIn: '3600s' });
+                const token = jwt.sign({email, username, id}, process.env.TOKEN_SECRET, { expiresIn: '3600s' });
                 return res.json({token, user: {email, username}})
             } catch(err){
                 console.log(err)
@@ -52,7 +52,7 @@ class AuthController{
             if(user && bcryptPassword){
                 //Send message and authentication key
                 const {email, username, id} = user.cols
-                const token = jwt.sign({id}, process.env.TOKEN_SECRET, { expiresIn: '3600s' });
+                const token = jwt.sign({email, username, id}, process.env.TOKEN_SECRET, { expiresIn: '3600s' });
                 return res.json({token, user: {email, username}})
             } else {
                 return res.status(400).json({message: 'Invalid Username/email or password'})
