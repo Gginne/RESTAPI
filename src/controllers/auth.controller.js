@@ -1,8 +1,8 @@
 const User = require('../models/User')
 const bcrypt = require('bcrypt')
 const db = require("../database/db")
-const {generateKey} = require("../test/keys")
-
+//const {generateKey} = require("../test/keys")
+const jwt = require("jsonwebtoken")
 class AuthController{
 
     static async register(req, res){
@@ -28,9 +28,11 @@ class AuthController{
                 const newUser = new User({email, username, password})
                 await newUser.save()
                 //Send message and authentication key
-                const {email, username, id} = newUser.cols
-                return res.json({user: {email, username, id}, key: generateKey()})
+                const {id} = newUser.cols
+                const token = jwt.sign({id}, process.env.TOKEN_SECRET, { expiresIn: '3600s' });
+                return res.json({token, user: {email, username}})
             } catch(err){
+                console.log(err)
                 return res.status(400).json({message: "Unsuccessfully registered"})
 
             }
@@ -41,7 +43,7 @@ class AuthController{
 
     static async login(req, res){
         const {name, password} = req.body
-        //console.log(req.body)
+        //console.log(req.body)gi
         if (name && password) {
             //Get user from model
            
@@ -50,7 +52,8 @@ class AuthController{
             if(user && bcryptPassword){
                 //Send message and authentication key
                 const {email, username, id} = user.cols
-                return res.json({user: {email, username, id}, key: generateKey()})
+                const token = jwt.sign({id}, process.env.TOKEN_SECRET, { expiresIn: '3600s' });
+                return res.json({token, user: {email, username}})
             } else {
                 return res.status(400).json({message: 'Invalid Username/email or password'})
             }
