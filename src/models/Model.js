@@ -1,8 +1,14 @@
 const db = require("../database/db")
 
 class Model{
-    static table = ""
-    static fillable = []
+    static get table() {
+        return null;
+    }
+
+    static get fillable() {
+        return null;
+    }
+    
 
     //Model constructor 
     constructor(cols){
@@ -64,10 +70,10 @@ class Model{
     //Save -- Saving new column  to table or updating existing one
     async save(){
         try{
-            const values = this.fillable.map(field => this.cols[field])
+            const values = this.constructor.fillable.map(field => this.cols[field])
             if(this.cols.id) {values.push(this.cols.id)}
-            const query = `INSERT INTO ${this.table} (${this.fillable.join()}) VALUES (?)
-            ON DUPLICATE KEY UPDATE ${this.fillable.map(field => `${field}=VALUES(${field})`).join()}`
+            const query = `INSERT INTO ${this.constructor.table} (${this.constructor.join()}) VALUES (?)
+            ON DUPLICATE KEY UPDATE ${this.constructor.fillable.map(field => `${field}=VALUES(${field})`).join()}`
             
             try{
                 const result = await db.query(query, [values])
